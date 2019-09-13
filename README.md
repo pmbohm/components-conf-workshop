@@ -55,6 +55,9 @@ yarn add aws-amplify aws-amplify-react uuid
 
 > If you have issues related to EACCESS try using sudo: `sudo npm <command>`.
 
+
+
+
 ## Installing the CLI & Initializing a new AWS Amplify Project
 
 ### Installing the CLI
@@ -64,6 +67,13 @@ Next, we'll install the AWS Amplify CLI:
 ```bash
 npm install -g @aws-amplify/cli
 ```
+### Or for multiple users 
+https://github.com/aws-amplify/amplify-cli/issues/197
+
+```bash
+https://github.com/aws-amplify/amplify-cli/issues/197
+```
+
 > If you have issues related to fsevents with npm install. Try: `npm audit fix --force`.
 
 Now we need to configure the CLI with our credentials:
