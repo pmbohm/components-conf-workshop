@@ -64,6 +64,17 @@ Next, we'll install the AWS Amplify CLI:
 ```bash
 npm install -g @aws-amplify/cli
 ```
+### Or for multiple users 
+https://github.com/aws-amplify/amplify-cli/issues/197
+
+```bash
+<<<<<<< HEAD
+https://github.com/aws-amplify/amplify-cli/issues/197
+=======
+npm install -g @aws-amplify/cli@multienv
+>>>>>>> mod the readme
+```
+
 > If you have issues related to fsevents with npm install. Try: `npm audit fix --force`.
 
 Now we need to configure the CLI with our credentials:
