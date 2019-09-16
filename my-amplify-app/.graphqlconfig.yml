@@ -1,6 +1,6 @@
 projects:
   CryptoGraphQL:
-    schemaPath: amplify/backend/api/CryptoGraphQL/build/schema.graphql
+    schemaPath: src/graphql/schema.json
     includes:
       - src/graphql/**/*.js
     excludes:
@@ -10,3 +10,7 @@ projects:
         codeGenTarget: javascript
         generatedFileName: ''
         docsFilePath: src/graphql
+        graphQLApiId: hiegobnmm5g27jha2rloyrulve
+      endpoints:
+        prod: >-
+          https://oim74vmirrgazbwkr3rrpksaoi.appsync-api.ap-southeast-2.amazonaws.com/graphql

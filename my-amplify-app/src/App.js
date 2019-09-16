@@ -13,27 +13,26 @@ import uuid from 'uuid/v4'
 import { onCreateCoin } from './graphql/subscriptions'
 import { onDeleteCoin } from './graphql/subscriptions'
 
-const CLIENT_ID = uuid()
+const CLIENT_ID = uuid();
 
 // create initial state
 const initialState = {
   name: '', price: '', symbol: '', coins: []
-}
+};
 
 // update reducer
 function reducer(state, action) {
   switch(action.type) {
     case 'SETCOINS':
-      return { ...state, coins: action.coins }
+      return { ...state, coins: action.coins };
     case 'SETINPUT':
-      return { ...state, [action.key]: action.value }
+      return { ...state, [action.key]: action.value };
     // new �
     case 'ADDCOIN':
-      return { ...state, coins: [...state.coins, action.coin] }
+      return { ...state, coins: [...state.coins, action.coin] };
     case 'DELETECOIN':
-      console.log(action)
-      console.log(state.coins.filter(c => c.id !== action.coin.id))
-      return { ...state, coins: state.coins.filter(c => c.id !== action.coin.id) }
+      console.log(state.coins.filter(c => c.id !== action.coin.id));
+      return { ...state, coins: state.coins.filter(c => c.id !== action.coin.id) };
     default:
       return state
   }
@@ -41,16 +40,16 @@ function reducer(state, action) {
 
 
 function App() {
-  const [state, dispatch] = useReducer(reducer, initialState)
+  const [state, dispatch] = useReducer(reducer, initialState);
 
   useEffect(() => {
     getData()
-  }, [])
+  }, []);
 
   async function getData() {
     try {
-      const coinData = await API.graphql(graphqlOperation(listCoins))
-      console.log('data from API: ', coinData)
+      const coinData = await API.graphql(graphqlOperation(listCoins));
+      console.log('data from API: ', coinData);
       dispatch({ type: 'SETCOINS', coins: coinData.data.listCoins.items})
     } catch (err) {
       console.log('error fetching data..', err)
@@ -60,31 +59,26 @@ function App() {
   async function deleteCoin(coin) {
     try {
       if (coin) {
-
-        //console.log(coin)
-        //console.log(state.coins.filter(c => c.id !== coin.id))
-
-        dispatch({ type: 'DELETECOIN', coin})
-
-        console.log(state.coins)
+        dispatch({ type: 'DELETECOIN', coin});
+        await API.graphql(graphqlOperation(DeleteCoin, { input: coin }));
       }
     } catch (err) {
-      console.log('error fetching data..', err)
+      console.log('error deleting coin..', err)
     }
   }
 
   async function createCoin() {
-    const { name, price, symbol } = state
-    if (name === '' || price === '' || symbol === '') return
+    const { name, price, symbol } = state;
+    if (name === '' || price === '' || symbol === '') return;
     const coin = {
       name, price: parseFloat(price), symbol, clientId: CLIENT_ID
-    }
-    const coins = [...state.coins, coin]
-    dispatch({ type: 'SETCOINS', coins })
-    console.log('coin:', coin)
+    };
+    const coins = [...state.coins, coin];
+    dispatch({ type: 'SETCOINS', coins });
+    //console.log('coin:', coin);
     
     try {
-      await API.graphql(graphqlOperation(CreateCoin, { input: coin }))
+      await API.graphql(graphqlOperation(CreateCoin, { input: coin }));
       console.log('item created!')
     } catch (err) {
       console.log('error creating coin...', err)
@@ -101,49 +95,55 @@ function App() {
   useEffect(() => {
     const subscription = API.graphql(graphqlOperation(onCreateCoin)).subscribe({
         next: (eventData) => {
-          const coin = eventData.value.data.onCreateCoin
-          if (coin.clientId === CLIENT_ID) return
+          const coin = eventData.value.data.onCreateCoin;
+          if (coin.clientId === CLIENT_ID) return;
           dispatch({ type: 'ADDCOIN', coin  })
         }
-    })
+    });
     return () => subscription.unsubscribe()
-  }, [])
+  }, []);
 
 
   // add UI with event handlers to manage user input
   return (
-    <div>
-    {JSON.stringify(state.coins)}
-      <input
-        name='name'
-        placeholder='name'
-        onChange={onChange}
-        value={state.name}
-      />
-      <input
-        name='price'
-        placeholder='price'
-        onChange={onChange}
-        value={state.price}
-      />
-      <input
-        name='symbol'
-        placeholder='symbol'
-        onChange={onChange}
-        value={state.symbol}
-      />
-      <button onClick={createCoin}>Create Coin</button>
-      {
-        state.coins.map((c, i) => (
-          <div key={i}>
-            <h2>{c.name}</h2>
-            <h4>{c.symbol}</h4>
-            <p>{c.price}</p>
-            <button onClick={() => deleteCoin(c)}>Delete Coin</button>
-          </div>
+    <div className="app-body m-4" >
+      <main className="main">
+        <input
+          name='name'
+          placeholder='name'
+          onChange={onChange}
+          value={state.name}
+        />
+        <input
+          name='price'
+          placeholder='price'
+          onChange={onChange}
+          value={state.price}
+        />
+        <input
+          name='symbol'
+          placeholder='symbol'
+          onChange={onChange}
+          value={state.symbol}
+        />
+        <button onClick={createCoin} className="m1" >Create Coin</button>
+      </main>
 
-        ))
-      }
+      <div >
+        {
+          state.coins.map((c, i) => (
+
+                <div className="card mr-1" key={i} style={{width: "10rem"}} >
+                  <div className="card-body">
+                    <h2 className="card-title" >{c.name}</h2>
+                    <h4>{c.symbol}</h4>
+                    <p>{c.price}</p>
+                    <button onClick={() => deleteCoin(c)}>Delete Coin</button>
+                  </div>
+                </div>
+          ))
+        }
+      </div>
     </div>
   )
 }

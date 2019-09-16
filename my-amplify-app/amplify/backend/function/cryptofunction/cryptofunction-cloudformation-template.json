@@ -62,8 +62,8 @@
 				"Runtime": "nodejs10.x",
 				"Timeout": "25",
 				"Code": {
-					"S3Bucket": "my-amplify-app-dev-20190909111231-deployment",
-					"S3Key": "amplify-builds/cryptofunction-746c3932632b72356369-build.zip"
+					"S3Bucket": "my-amplify-app-20190916173122-deployment",
+					"S3Key": "amplify-builds/cryptofunction-1568619348-latest-build.zip"
 				}
 			}
 		},

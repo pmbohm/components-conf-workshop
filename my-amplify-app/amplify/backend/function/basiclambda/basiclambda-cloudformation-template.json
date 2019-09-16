@@ -62,8 +62,8 @@
 				"Runtime": "nodejs10.x",
 				"Timeout": "25",
 				"Code": {
-					"S3Bucket": "my-amplify-app-dev-20190909111231-deployment",
-					"S3Key": "amplify-builds/basiclambda-5548627141444f64576d-build.zip"
+					"S3Bucket": "my-amplify-app-20190916173122-deployment",
+					"S3Key": "amplify-builds/basiclambda-1568619347-latest-build.zip"
 				}
 			}
 		},
