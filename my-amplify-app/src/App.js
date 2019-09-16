@@ -31,7 +31,6 @@ function reducer(state, action) {
     case 'ADDCOIN':
       return { ...state, coins: [...state.coins, action.coin] };
     case 'DELETECOIN':
-      console.log(state.coins.filter(c => c.id !== action.coin.id));
       return { ...state, coins: state.coins.filter(c => c.id !== action.coin.id) };
     default:
       return state
@@ -49,7 +48,7 @@ function App() {
   async function getData() {
     try {
       const coinData = await API.graphql(graphqlOperation(listCoins));
-      console.log('data from API: ', coinData);
+      //console.log('data from API: ', coinData);
       dispatch({ type: 'SETCOINS', coins: coinData.data.listCoins.items})
     } catch (err) {
       console.log('error fetching data..', err)
@@ -59,8 +58,9 @@ function App() {
   async function deleteCoin(coin) {
     try {
       if (coin) {
+        console.log('coin:', coin);
         dispatch({ type: 'DELETECOIN', coin});
-        await API.graphql(graphqlOperation(DeleteCoin, { input: coin }));
+        await API.graphql(graphqlOperation(DeleteCoin, { input: {id: coin.id} }));
       }
     } catch (err) {
       console.log('error deleting coin..', err)
@@ -73,9 +73,14 @@ function App() {
     const coin = {
       name, price: parseFloat(price), symbol, clientId: CLIENT_ID
     };
-    const coins = [...state.coins, coin];
+    let coins = state.coins;
+    if (! state.coins.some(v => (v.name === coin.name || v.symbol === coin.symbol))) {
+      coins = [...state.coins, coin];
+      console.log('coins:', coins);
+    }
+
     dispatch({ type: 'SETCOINS', coins });
-    //console.log('coin:', coin);
+
     
     try {
       await API.graphql(graphqlOperation(CreateCoin, { input: coin }));
@@ -94,11 +99,22 @@ function App() {
   // subscribe in useEffect
   useEffect(() => {
     const subscription = API.graphql(graphqlOperation(onCreateCoin)).subscribe({
-        next: (eventData) => {
-          const coin = eventData.value.data.onCreateCoin;
-          if (coin.clientId === CLIENT_ID) return;
-          dispatch({ type: 'ADDCOIN', coin  })
-        }
+      next: (eventData) => {
+        const coin = eventData.value.data.onCreateCoin;
+        if (coin.clientId === CLIENT_ID) return;
+        dispatch({ type: 'ADDCOIN', coin  })
+      }
+    });
+    return () => subscription.unsubscribe()
+  }, []);
+
+  useEffect(() => {
+    const subscription = API.graphql(graphqlOperation(onDeleteCoin)).subscribe({
+      next: (eventData) => {
+        const coin = eventData.value.data.onDeleteCoin;
+        if (coin.clientId === CLIENT_ID) return;
+        dispatch({ type: 'DELETECOIN', coin  })
+      }
     });
     return () => subscription.unsubscribe()
   }, []);
